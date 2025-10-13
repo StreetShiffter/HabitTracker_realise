@@ -4,6 +4,7 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.shortcuts import get_object_or_404
 
 from users.models import User
 from users.serializers import UserRegisterSerializer, UserProfileSerializer
@@ -24,12 +25,10 @@ class UserListAPIView(ListAPIView):
 
 
 class UserProfileAPIView(RetrieveUpdateDestroyAPIView):
-    """Просмотр, редактирование и удаление профиля"""
+    """Просмотр, редактирование и удаление своего профиля"""
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdminForProfile]
 
     def get_object(self):
-        user_id = self.kwargs.get('pk')
-        if user_id:
-            return User.objects.get(pk=user_id)
+        # Работаем только со своим профилем
         return self.request.user
