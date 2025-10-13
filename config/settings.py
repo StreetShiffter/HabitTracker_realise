@@ -30,10 +30,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "tracker",
+    "tracker",
     "rest_framework",
     "rest_framework_simplejwt",
-    # "users",
+    "users",
     "django_filters",
     "drf_spectacular",
     "django_celery_beat",
@@ -159,7 +159,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-# AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
+AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
 #
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') #Настройки почты
 EMAIL_HOST = os.getenv('EMAIL_HOST')
