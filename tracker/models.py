@@ -4,6 +4,7 @@ from users.models import User
 
 
 class Habit(models.Model):
+    """Модель привычек: полезные и приятные"""
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

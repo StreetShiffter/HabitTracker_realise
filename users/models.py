@@ -20,6 +20,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    """Модель пользователя """
     username = models.CharField(
         max_length=20,
         blank=True,
