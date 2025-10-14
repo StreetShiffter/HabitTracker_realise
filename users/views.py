@@ -19,11 +19,12 @@ class UserCreateAPIView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save(is_active=True)
+        message = "🎉 Добро пожаловать! Вы успешно зарегистрировались в трекере привычек."
         if user.telegram_chat_id:
             try:
                 send_telegram_message(
                     chat_id=user.telegram_chat_id,
-                    message="🎉 Добро пожаловать! Вы успешно зарегистрировались в трекере привычек."
+                    message=message
                 )
             except Exception as e:
                 print(f"Ошибка отправки Telegram: {e}")
