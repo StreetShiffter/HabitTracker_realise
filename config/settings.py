@@ -212,28 +212,28 @@ LOGGING = {
 # LOGOUT_REDIRECT_URL = 'mailservices:home'# Редирект после выхода(имя приложения и имя в url )
 # LOGIN_URL = 'users:register'# Редирект на страницу регистрации, если вьюшка защищена миксином LoginRequiredMixin
 #
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': os.getenv('REDIS_URL'),
-#     }
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL'),
+    }
+}
 
 
 # Настройки Celery
-# CELERY_BROKER_URL = "redis://localhost:6379/0"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-#
-# # Используем eventlet на Windows
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+# Используем eventlet на Windows
 # CELERY_WORKER_POOL = "eventlet"
 # CELERY_WORKER_POOL_RESTARTS = True
-#
-# # Опционально: сериализация
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-# CELERY_TIMEZONE = TIME_ZONE
-#
+
+# Опционально: сериализация
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+
 # # Настройки Celery Beat (планировщик)
 # CELERY_BEAT_SCHEDULE = {
 #     'deactivate-inactive-users-daily': {

@@ -10,7 +10,8 @@ class HabitSerializer(serializers.ModelSerializer):
         read_only_fields = ('owner',)
 
     def validate(self, data):
-        # Валидация на уровне сериализатора
-        habit = Habit(**data)
-        habit.clean()
+        # Валидация модели только при создании
+        if not self.instance:
+            temp = Habit(**data)
+            temp.clean()
         return data

@@ -5,6 +5,17 @@ from users.models import User
 
 class Habit(models.Model):
     """Модель привычек: полезные и приятные"""
+    STARTED = 'started'
+    COMPLETED = 'completed'
+    FAILED = 'failed'
+
+
+    STATUS_CHOICES = [
+        (STARTED, 'запущена'),
+        (COMPLETED, 'выполнена'),
+        (FAILED, 'провалена'),
+    ]
+
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -43,6 +54,8 @@ class Habit(models.Model):
     )
 
     is_public = models.BooleanField(default=False, verbose_name="Публичная")
+
+    status  = models.CharField(max_length=15, choices=STATUS_CHOICES, default=STARTED)
 
     def clean(self):
         if self.duration > 120:
