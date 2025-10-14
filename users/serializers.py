@@ -10,8 +10,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ["email", "username", "password", "city", "phone", "telegram_chat_id"]
 
+
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        """Сохраняем пользователя и хэшируем пароль для БД"""
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.is_active = True
+        user.save()
         return user
 
 
