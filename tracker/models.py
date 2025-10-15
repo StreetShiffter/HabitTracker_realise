@@ -57,6 +57,13 @@ class Habit(models.Model):
 
     status  = models.CharField(max_length=15, choices=STATUS_CHOICES, default=STARTED)
 
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    last_completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Последнее выполнение"
+    )
+
     def clean(self):
         if self.duration > 120:
             raise ValidationError("Время на выполнение не должно превышать 120 секунд.")

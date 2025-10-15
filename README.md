@@ -36,6 +36,7 @@
 ![Spectacular](https://img.shields.io/badge/drf--spectacular-%235272B4.svg?style=for-the-badge&logo=openapi-initiative&logoColor=white)
 ![SimpleJWT](https://img.shields.io/badge/djangorestframework--simplejwt-%23092E20.svg?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?style=for-the-badge&logo=postgresql&logoColor=white)
+![requests](https://img.shields.io/badge/requests-3498db?logo=python&logoColor=white)
 
 ![Black](https://img.shields.io/badge/black-000000?style=flat&logo=python&logoColor=white)
 ![Mypy](https://img.shields.io/badge/mypy-checked-blue.svg?logo=python&logoColor=green)
@@ -63,63 +64,29 @@ python manage.py createsuperuser # дать суперпользователя �
 python manage.py shell -i ipython #Запуск DJANGO SHELL
 
 ```
-🔄 ОБНОВЛЕНИЕ ДАННЫХ
-
-
 
 # ✒️ Использование API
-*Get запросы на список*
-![Get запросы на список](./media/get.jpg)
 
-*Get запросы на конкретный объект*
-![Get запросы на конкретный объект](./media/get_pk.jpg)
-
-Для POSTMAN можно выполнять фильтрацию и поиск, если они указаны в полях вьюшки-ендпоинте:
+⚠️️ ВАЖНО ⚠️
 ```
-http://localhost:8000/users/payment/ - основа
-http://localhost:8000/users/payment/?ordering=payment_date=false - сортировка по убыванию(указываем функцию и по какому полю из вьюшки)
-http://localhost:8000/users/payment/?payment_method=transfer - фильтрация (можно не указывать поле filterset) 
-```
-![Get запросы на конкретный объект](./media/endpoint_filter_ordering.jpg)
-
-ПРОВЕРКА В DJANGO_SHELL на названия нужных прав:
-```
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-
-# Найди контент-тип для модели Course
-course_ct = ContentType.objects.get(app_label='educations', model='course')
-lesson_ct = ContentType.objects.get(app_label='educations', model='lesson')
-
-# Посмотри разрешения
-perms = Permission.objects.filter(
-    content_type__in=[course_ct, lesson_ct],
-    codename__in=[
-        'add_course', 'change_course',
-        'add_lesson', 'change_lesson'
-    ]
-)
-
-for p in perms:
-    print(p.codename, p.id)
-```
-
-
-```
-️ ВАЖНО ⚠️
-
 python manage.py runserver 8080 # Запуск сервера
 CTRL+С # Отключение сервера
 ```
 
 🔝 РАБОТА с CELERY 
-*Запуск команд воркера и планера*
+*Запуск команд воркера Celery*
 ```
 poetry run celery -A config worker -l INFO -P eventlet
 poetry run celery -A config beat -l INFO
 poetry run celery -A my_project worker —loglevel=info
 poetry run celery -A my_project beat —loglevel=info
 ```
+
+*Запуск команд планера Celery*
+```
+poetry run celery -A config worker -l INFO
+```
+
 Далее работа в *setting.py*
 ```
 INSTALLED_APPS = [
@@ -135,11 +102,14 @@ poetry run python manage.py migrate
 
 ### 🌐 Пример страниц:
 *Главная страница*
+![Главная страница с указанием страницы](./media/postman.jpg)
 
+*Работа бота*
+![<Бот телеграм>](./media/telegram.jpg)
 
 
 📡 API Документация
-API доступно по адресу: http://localhost:8000/api/
+API доступно по адресу: http://localhost:8000/swagger/#/
 
 Postman коллекция
 Для удобства тестирования API предоставлена коллекция Postman:
@@ -152,10 +122,10 @@ Postman коллекция
 
 💡 Совет: Импортируйте коллекцию в Postman → "Import" → "Link" или "File". 
 ### 📶 Работа с запросами
+
 ```
-http://localhost:8000/users/payment/ - основа
-http://localhost:8000/users/payment/?ordering=payment_date=false - сортировка по убыванию(указываем функцию и по какому полю из вьюшки)
-http://localhost:8000/users/payment/?payment_method=transfer - фильтрация (можно не указывать поле filterset) 
+http://localhost:8000/tracker/ - основа
+http://localhost:8000/tracker/?ordering=time - сортировка по времени 
 
 Регистрация:
 http://localhost:8000/users/register/ - post(json-raw)
@@ -167,21 +137,22 @@ http://localhost:8000/users/login/ в body отправить json (json-raw)
 http://localhost:8000/users/profile/ (headers) Accept -Bearer  токен 
 
 Редактирование профиля patch:
-http://localhost:8000/users/profile/ (json-raw) patch + (headers) Accept -Bearer токен
+http://localhost:8000/users/profile/ (json-raw) patch + (headers) Accept -Bearer токен (ТОЛЬКО ВЛАДЕЛЬЦАМ)
 
 Редактирование профиля полностью( нужны важные поля входа в аккаунт) put:
-http://localhost:8000/users/profile/ (json-raw) patch + (headers) Accept - Bearer токен 
+http://localhost:8000/users/profile/ (json-raw) patch + (headers) Accept - Bearer токен  (ТОЛЬКО ВЛАДЕЛЬЦАМ)
 
 Удаление профиля delete:
-http://localhost:8000/users/profile/delete (headers) Bearer  токен 
+http://localhost:8000/users/profile/delete (headers) Bearer  токен (ТОЛЬКО ВЛАДЕЛЬЦАМ)
 
 Просмотр списков пользователя get:
-http://localhost:8000/users/list/(headers) Accept - Bearer  токен 
+http://localhost:8000/users/list/(headers) Accept - Bearer  токен (ТОЛЬКО АДМИНАМ)
 
 Отправка refresh токена post:
 http://localhost:8000/users/list/(headers) Content-Type - application/json/ 
 в body отправить json
 {"refresh":"токен"} 
 ```
+
 📄 Лицензия
 Этот проект лицензирован по MIT License — подробнее см. файл LICENSE.
