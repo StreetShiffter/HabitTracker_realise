@@ -3,12 +3,12 @@ from django.utils import timezone
 from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .models import Habit
 from .serializers import HabitSerializer
 from .permissions import IsOwnerOrReadOnlyForPublic
-from .tacks import send_telegram_message_task
-
+from .tasks import send_telegram_message_task
 
 class HabitPagination(PageNumberPagination):
     """Пагинация для вывода списка привычек на странице"""
@@ -21,7 +21,8 @@ class HabitViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели привычки с разделением прав и сереализатором"""
     serializer_class = HabitSerializer
     pagination_class = HabitPagination
-    permission_classes = [IsOwnerOrReadOnlyForPublic]
+    # Замена IsAuthenticated - неавторизованный может посмотреть публичное
+    permission_classes = [IsOwnerOrReadOnlyForPublic, IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['is_public']
     ordering_fields = ['time', 'periodicity']
@@ -29,6 +30,16 @@ class HabitViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+
+        # ДОБАВЬТЕ ЭТО В НАЧАЛО:
+        if not user.is_authenticated:
+            # Анонимный пользователь видит только публичные привычки
+            if self.action == 'list':
+                return Habit.objects.filter(is_public=True)
+            else:
+                # Для деталей тоже только публичные
+                return Habit.objects.filter(is_public=True)
+
         if user.is_staff:
             return Habit.objects.all()
 
@@ -45,6 +56,7 @@ class HabitViewSet(viewsets.ModelViewSet):
         habit = serializer.save(owner=self.request.user)
         tg_id = habit.owner.telegram_chat_id
 
+
         if not tg_id:
             return
 
@@ -60,7 +72,7 @@ class HabitViewSet(viewsets.ModelViewSet):
                 else:
                     message = f"Создана новая привычка: {habit.action} в {habit.place}"
 
-            send_telegram_message_task(chat_id=tg_id, message=message)
+            send_telegram_message_task.delay(chat_id=tg_id, message=message)
 
         except Exception as e:
             print(f"Ошибка отправки Telegram: {e}")
@@ -82,7 +94,7 @@ class HabitViewSet(viewsets.ModelViewSet):
                 try:
                     reward = habit.related_habit.action if habit.related_habit else habit.reward
                     message = f"Привычка '{habit.action}' выполнена! Награда: {reward or 'Отличная работа!'}"
-                    send_telegram_message_task(tg_id, message)
+                    send_telegram_message_task.delay(tg_id, message)
                 except Exception as e:
                     print(f"Ошибка Telegram при завершении: {e}")
 

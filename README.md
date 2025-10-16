@@ -37,6 +37,7 @@
 ![SimpleJWT](https://img.shields.io/badge/djangorestframework--simplejwt-%23092E20.svg?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?style=for-the-badge&logo=postgresql&logoColor=white)
 ![requests](https://img.shields.io/badge/requests-3498db?logo=python&logoColor=white)
+![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen?logo=codecov)
 
 ![Black](https://img.shields.io/badge/black-000000?style=flat&logo=python&logoColor=white)
 ![Mypy](https://img.shields.io/badge/mypy-checked-blue.svg?logo=python&logoColor=green)
@@ -52,7 +53,7 @@ poetry add dotenv # Установка библиотеки для работы 
 poetry add ipython # Установка библиотеки для работы с чувствительными данными
 poetry add psycopg2 # Установка инструмента для работы с ORM
 
-poetry add --dev flake8 mypy isort black # Eстановка всех dev зависимостей 
+poetry add --dev flake8 mypy isort black # Установка всех dev зависимостей 
 
 django-admin startproject config . # Старт нового проекта
 django-admin startproject myproject # Старт нового приложения
@@ -104,7 +105,9 @@ poetry run python manage.py migrate
 *Главная страница*
 ![Главная страница с указанием страницы](./media/postman.jpg)
 
+
 *Работа бота*
+
 ![<Бот телеграм>](./media/telegram.jpg)
 
 
@@ -153,6 +156,25 @@ http://localhost:8000/users/list/(headers) Content-Type - application/json/
 в body отправить json
 {"refresh":"токен"} 
 ```
+### ТЕСТЫ 
+
+Для запусков тестов воспользуйтесь командами:
+
+*Пропишите приложение "tracker" или "users" для формирования тестов конкретного приложения*
+```
+coverage run --source='tracker/' manage.py test tracker.tests 
+coverage report
+coverage html
+```
+*Или же покрытие разом двух приложений*
+```
+coverage run --source='.' manage.py test tracker.tests users.tests
+```
+
+![Итоги тестов](./media/test.jpg)
+
+Отчет тестов создастся по пути *HabitTracker\htmlcov\index.html*
+
 
 📄 Лицензия
 Этот проект лицензирован по MIT License — подробнее см. файл LICENSE.
