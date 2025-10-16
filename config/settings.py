@@ -161,16 +161,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
 #
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') #Настройки почты
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS = True if os.getenv('EMAIL_USE_TLS') == 'True' else False
-EMAIL_USE_SSL = True if os.getenv('EMAIL_USE_SSL') == 'True' else False
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")  # Настройки почты
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = True if os.getenv("EMAIL_USE_TLS") == "True" else False
+EMAIL_USE_SSL = True if os.getenv("EMAIL_USE_SSL") == "True" else False
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-#
+
 
 if "test" in sys.argv:
     ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
@@ -213,31 +213,31 @@ LOGGING = {
 # LOGIN_URL = 'users:register'# Редирект на страницу регистрации, если вьюшка защищена миксином LoginRequiredMixin
 #
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL'),
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL"),
     }
 }
 
 
 # Настройки Celery
-if 'test' in sys.argv:
+if "test" in sys.argv:
     # Настройки для тестов
     CELERY_TASK_ALWAYS_EAGER = True
     CELERY_TASK_EAGER_PROPAGATES = True
     # Используем memory backend вместо Redis
-    CELERY_RESULT_BACKEND = 'cache'
-    CELERY_CACHE_BACKEND = 'memory'
+    CELERY_RESULT_BACKEND = "cache"
+    CELERY_CACHE_BACKEND = "memory"
 else:
     # Реальные настройки
-    CELERY_BROKER_URL = 'redis://localhost:6379/0'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
-## Настройки Celery Beat (планировщик) каждые 6 часов, чтобы не "проморгать" момент отправки
+# Настройки Celery Beat (планировщик) каждые 6 часов, чтобы не "проморгать" момент отправки
 CELERY_BEAT_SCHEDULE = {
-    'check-habits-daily': {
-        'task': 'tracker.tasks.check_all_habits',
-        'schedule': crontab(minute=0, hour='*/6'),
+    "check-habits-daily": {
+        "task": "tracker.tasks.check_all_habits",
+        "schedule": crontab(minute=0, hour="*/6"),
     },
 }
 TELEGRAM_URL = "https://api.telegram.org/bot"

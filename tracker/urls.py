@@ -6,8 +6,8 @@ from .apps import TrackerConfig
 app_name = TrackerConfig.name
 
 router = DefaultRouter()
-router.register(r'tracker', HabitViewSet, basename='tracker')
+router.register(r"tracker", HabitViewSet, basename="tracker")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

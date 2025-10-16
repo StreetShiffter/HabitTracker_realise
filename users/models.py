@@ -20,7 +20,8 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    """Модель пользователя """
+    """Модель пользователя"""
+
     username = models.CharField(
         max_length=20,
         blank=True,
@@ -41,15 +42,10 @@ class User(AbstractUser):
         null=True,
         verbose_name="Телефон",
     )
-    city = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name="Город"
-    )
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Город")
 
     telegram_chat_id = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name="Telegram Chat ID"
+        max_length=50, blank=True, null=True, verbose_name="Telegram Chat ID"
     )
 
     is_active = models.BooleanField(default=True, verbose_name="Активен")
