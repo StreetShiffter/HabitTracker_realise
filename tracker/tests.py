@@ -772,8 +772,8 @@ class HabitCeleryTest(TestCase):
         check_all_habits()
 
         # Задачи должны ни разу не вызаваться
-        mock_send_reminder.assert_not_called(habit.id)
-        mock_send_failure.assert_not_called(habit.id)
+        mock_send_reminder.assert_not_called()
+        mock_send_failure.assert_not_called()
 
     @patch("tracker.tasks.send_reminder.delay")
     @patch("tracker.tasks.send_failure.delay")
