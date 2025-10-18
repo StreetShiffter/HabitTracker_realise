@@ -85,7 +85,7 @@ poetry run celery -A my_project beat —loglevel=info
 
 *Запуск команд планера Celery*
 ```
-poetry run celery -A config worker -l INFO
+poetry run celery -A config worker -pool=eventlet -l INFO
 ```
 
 Далее работа в *setting.py*
