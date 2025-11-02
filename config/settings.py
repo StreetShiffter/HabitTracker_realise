@@ -77,7 +77,7 @@ MIDDLEWARE = [
 #     # и добавьте адрес бэкенд-сервера
 # ]
 #
-# CORS_ALLOW_ALL_ORIGINS = False
+# CORS_ALLOW_ALL_ORIGINS = True # только если DEBUG=True
 
 ROOT_URLCONF = "config.urls"
 
