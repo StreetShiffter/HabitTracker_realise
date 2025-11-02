@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "StreetShiffter",email = "agwzdushaz@gmail.com"}
 ]
-package-mode = false
+
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
@@ -31,6 +31,13 @@ dependencies = [
     "isort (>=7.0.0,<8.0.0)"
 ]
 
+[tool.poetry]
+name = "habittracker"
+version = "0.1.0"
+description = ""
+authors = ["StreetShiffter <agwzdushaz@gmail.com>"]
+package-mode = false  # ← теперь правильно
+readme = "README.md"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
