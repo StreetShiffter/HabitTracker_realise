@@ -30,10 +30,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "tracker",
+    "tracker",
     "rest_framework",
     "rest_framework_simplejwt",
-    # "users",
+    "users",
     "django_filters",
     "drf_spectacular",
     "django_celery_beat",
@@ -77,7 +77,7 @@ MIDDLEWARE = [
 #     # и добавьте адрес бэкенд-сервера
 # ]
 #
-# CORS_ALLOW_ALL_ORIGINS = False
+# CORS_ALLOW_ALL_ORIGINS = True # только если DEBUG=True
 
 ROOT_URLCONF = "config.urls"
 
@@ -140,7 +140,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "ru"
 
-TIME_ZONE = "Asia/Novosibirsk"
+TIME_ZONE = os.getenv("TIME_ZONE")
 
 USE_I18N = True
 
@@ -159,18 +159,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-# AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
+AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
 #
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') #Настройки почты
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_USE_TLS = True if os.getenv('EMAIL_USE_TLS') == 'True' else False
-EMAIL_USE_SSL = True if os.getenv('EMAIL_USE_SSL') == 'True' else False
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")  # Настройки почты
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = True if os.getenv("EMAIL_USE_TLS") == "True" else False
+EMAIL_USE_SSL = True if os.getenv("EMAIL_USE_SSL") == "True" else False
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-#
+
 
 if "test" in sys.argv:
     ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
@@ -212,32 +212,33 @@ LOGGING = {
 # LOGOUT_REDIRECT_URL = 'mailservices:home'# Редирект после выхода(имя приложения и имя в url )
 # LOGIN_URL = 'users:register'# Редирект на страницу регистрации, если вьюшка защищена миксином LoginRequiredMixin
 #
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': os.getenv('REDIS_URL'),
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL"),
+    }
+}
 
 
 # Настройки Celery
-# CELERY_BROKER_URL = "redis://localhost:6379/0"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-#
-# # Используем eventlet на Windows
-# CELERY_WORKER_POOL = "eventlet"
-# CELERY_WORKER_POOL_RESTARTS = True
-#
-# # Опционально: сериализация
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-# CELERY_TIMEZONE = TIME_ZONE
-#
-# # Настройки Celery Beat (планировщик)
-# CELERY_BEAT_SCHEDULE = {
-#     'deactivate-inactive-users-daily': {
-#         'task': 'educations.tasks.deactivate_inactive_users',
-#         'schedule': crontab(hour=2, minute=0),  # каждый день в 02:00
-#     },
-# }
+if "test" in sys.argv:
+    # Настройки для тестов
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
+    # Используем memory backend вместо Redis
+    CELERY_RESULT_BACKEND = "cache"
+    CELERY_CACHE_BACKEND = "memory"
+else:
+    # Реальные настройки
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+# Настройки Celery Beat (планировщик) каждые 6 часов, чтобы не "проморгать" момент отправки
+CELERY_BEAT_SCHEDULE = {
+    "check-habits-daily": {
+        "task": "tracker.tasks.check_all_habits",
+        "schedule": crontab(minute=0, hour="*/6"),
+    },
+}
+TELEGRAM_URL = "https://api.telegram.org/bot"
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
