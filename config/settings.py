@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["ALLOWED_HOSTS", "*"]
 
 
 # Application definition
@@ -30,10 +30,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "tracker",
+    "tracker",
     "rest_framework",
     "rest_framework_simplejwt",
-    # "users",
+    "users",
     "django_filters",
     "drf_spectacular",
     "django_celery_beat",
@@ -110,7 +110,9 @@ DATABASES = {
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
+        "HOST": os.getenv(
+            "DB_HOST", "localhost"
+        ),  # "db" (имя сервиса docker-compose из .env)
         "PORT": os.getenv("DB_PORT"),
     },
 }
@@ -151,7 +153,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATICFILES_DIRS = [BASE_DIR / "static"] # исходники статики
+# Путь в файловой системе, куда collectstatic будет копировать все файлы (как в VOLUMES)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -159,7 +162,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-# AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
+AUTH_USER_MODEL = "users.User"  # Указываем кастомную модель для уинтификации
 #
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') #Настройки почты
 EMAIL_HOST = os.getenv('EMAIL_HOST')
@@ -172,13 +175,59 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 #
 
-if "test" in sys.argv:
-    ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
-
-    # Дополнительные настройки для тестов
-    PASSWORD_HASHERS = [
-        "django.contrib.auth.hashers.MD5PasswordHasher",  # Быстрее для тестов
-    ]
+# Настройки для тестирования SQLITE, включая CI/CD
+# if "test" in sys.argv:
+#     ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
+#
+#     # Дополнительные настройки для тестов
+#     PASSWORD_HASHERS = [
+#         "django.contrib.auth.hashers.MD5PasswordHasher",  # Быстрее для тестов
+#     ]
+#
+#     # 🗃️ База данных - для тестов стоковая
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": BASE_DIR / "db.sqlite3",
+#         }
+#     }
+#
+#     LANGUAGE_CODE = "ru-ru"
+#     TIME_ZONE = "UTC"
+#     USE_I18N = True
+#     USE_TZ = True
+#
+#     # 📦 Статика
+#     STATIC_URL = "/static/"
+#     STATICFILES_DIRS = []
+#
+#     # 📧 Email
+#     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+#
+#     # ПРОИЗВОЛЬНЫЙ КЛЮЧ ДЛЯ ТЕСТОВ
+#     SECRET_KEY = "ci-test-secret-key-unsafe-but-ok"
+#     DEBUG = True
+#     ROOT_URLCONF = "config.urls"
+#
+#     # 🔑 Указываем, что кастомная модель User — основная
+#     AUTH_USER_MODEL = "users.User"
+#
+#     # 🖼️ TEMPLATES — обязательно для админки
+#     TEMPLATES = [
+#         {
+#             "BACKEND": "django.template.backends.django.DjangoTemplates",
+#             "DIRS": [],
+#             "APP_DIRS": True,
+#             "OPTIONS": {
+#                 "context_processors": [
+#                     "django.template.context_processors.debug",
+#                     "django.template.context_processors.request",
+#                     "django.contrib.auth.context_processors.auth",
+#                     "django.contrib.messages.context_processors.messages",
+#                 ],
+#             },
+#         },
+#     ]
 
 LOGGING = {
     "version": 1,
@@ -221,18 +270,18 @@ LOGGING = {
 
 
 # Настройки Celery
-# CELERY_BROKER_URL = "redis://localhost:6379/0"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-#
-# # Используем eventlet на Windows
-# CELERY_WORKER_POOL = "eventlet"
-# CELERY_WORKER_POOL_RESTARTS = True
-#
-# # Опционально: сериализация
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-# CELERY_TIMEZONE = TIME_ZONE
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+# Используем eventlet на Windows
+CELERY_WORKER_POOL = "eventlet"
+CELERY_WORKER_POOL_RESTARTS = True
+
+# Опционально: сериализация
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
 #
 # # Настройки Celery Beat (планировщик)
 # CELERY_BEAT_SCHEDULE = {

@@ -5,6 +5,7 @@ description = ""
 authors = [
     {name = "StreetShiffter",email = "agwzdushaz@gmail.com"}
 ]
+package-mode = false
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
@@ -21,7 +22,8 @@ dependencies = [
     "django-filter (>=25.2,<26.0)",
     "celery (>=5.5.3,<6.0.0)",
     "redis (>=6.4.0,<7.0.0)",
-    "eventlet (>=0.40.3,<0.41.0)"
+    "eventlet (>=0.40.3,<0.41.0)",
+    "gunicorn (>=23.0.0,<24.0.0)"
 ]
 
 
