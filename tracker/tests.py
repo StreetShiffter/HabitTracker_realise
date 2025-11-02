@@ -755,7 +755,7 @@ class HabitCeleryTest(TestCase):
     ):
         """Тест: привычка не требует напоминания и не проваливается"""
 
-        habit = Habit.objects.create(  # noqa: F841
+        Habit.objects.create(
             owner=self.user,
             place="Дом",
             time=time(10, 0),

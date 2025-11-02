@@ -6,6 +6,7 @@ from rest_framework import status
 from users.models import User
 from unittest.mock import patch
 from users.permissions import IsOwnerOrAdminForProfile
+from users.services import send_telegram_message
 
 
 class UserModelTest(TestCase):
@@ -258,8 +259,6 @@ class UserServiceTest(TestCase):
         mock_send_telegram.return_value = {"ok": True}
         # До патча функция вызывалась оригинально, но после патча вызывая оригинал
         # подставляется патч и работает мок объект
-        from users.services import send_telegram_message  # noqa: F841
-
         result = send_telegram_message("123456789", "Test message")
 
         # Проверяем, что мок был вызван с правильными аргументами
