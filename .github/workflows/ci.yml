@@ -244,6 +244,7 @@ jobs:
 #
 #            sudo docker compose down || true
 #            sudo docker compose up -d --build
+#            sudo docker system prune -a -f
 
 
 
@@ -301,4 +302,6 @@ jobs:
             docker compose down
             docker compose pull
             docker compose up -d
+# Подчищаем остатки образов от прошлого деплоя
+            docker system prune -a -f
           EOF

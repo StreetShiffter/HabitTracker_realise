@@ -5,11 +5,14 @@ services:
     #build: . # Для сборка через github(поменяйте коммент на image, если надо с dockerhub)
     image: ${DOCKER_IMAGE}:${IMAGE_TAG}
 #Подгрузка статики и запуск вебсервера для приложения
-    command: sh -c "python manage.py collectstatic --noinput 
-             && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    command: sh -c "
+      python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:8000
+      "
     # тома для сохранения данных вне контейнера
     volumes:
-      - .:/DJANGO_REST_HW
+      - .:/HabbitTracker
       - static_volume:/HabbitTracker/staticfiles
       - media_volume:/HabbitTracker/media
     ports:
