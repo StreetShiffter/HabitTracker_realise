@@ -291,6 +291,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: 🔄 Деплой через Docker Compose
+        # Подчищаем остатки образов от прошлого деплоя: docker system prune -a -f
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SECRET_IP }} << EOF
             cd ${{ secrets.DEPLOY_DIR }}
@@ -302,6 +303,5 @@ jobs:
             docker compose down
             docker compose pull
             docker compose up -d
-# Подчищаем остатки образов от прошлого деплоя
             docker system prune -a -f
           EOF
