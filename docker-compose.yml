@@ -4,7 +4,7 @@ services:
   web:
     #build: . # Для сборка через github(поменяйте коммент на image, если надо с dockerhub)
     image: ${DOCKER_IMAGE}:${IMAGE_TAG}
-#Подгрузка статики? запуск миграцйй и запуск вебсервера для приложения
+#Подгрузка статики, запуск миграцйй и запуск вебсервера для приложения
     command: sh -c "
       python manage.py migrate --noinput &&
       python manage.py collectstatic --noinput &&
@@ -65,7 +65,9 @@ services:
     # получаем образ с dockerhub
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6379:6379" # Если Redis нужен только внутри Docker-сети
+                    # (а так и есть — им пользуются web, worker, beat),
+                    # то порт на хосте не нужен.
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s

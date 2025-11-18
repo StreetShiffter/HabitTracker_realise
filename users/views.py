@@ -31,6 +31,7 @@ class UserCreateAPIView(CreateAPIView):
                 print(f"Ошибка отправки Telegram: {e}")
 
 
+
 class UserListAPIView(ListAPIView):
     """Список всех пользователей — только для админов"""
 
