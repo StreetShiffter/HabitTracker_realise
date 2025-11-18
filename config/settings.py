@@ -1,8 +1,7 @@
 import os
-import sys
 from datetime import timedelta
 
-from celery.schedules import crontab
+# from celery.schedules import crontab
 from dotenv import load_dotenv
 
 from pathlib import Path
@@ -18,7 +17,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["ALLOWED_HOSTS", "*"]
 
 
 # Application definition
@@ -110,7 +109,9 @@ DATABASES = {
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
+        "HOST": os.getenv(
+            "DB_HOST", "localhost"
+        ),  # "db" (имя сервиса docker-compose из .env)
         "PORT": os.getenv("DB_PORT"),
     },
 }
@@ -140,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "ru"
 
-TIME_ZONE = os.getenv("TIME_ZONE")
+TIME_ZONE = "Asia/Novosibirsk"
 
 USE_I18N = True
 
@@ -151,7 +152,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATICFILES_DIRS = [BASE_DIR / "static"]  # исходники статики
+
+# Путь в файловой системе, куда collectstatic будет копировать все файлы (как в VOLUMES)
+STATIC_ROOT = BASE_DIR / "staticfiles"  # сюда collectstatic будет копировать всё
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -170,15 +174,61 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+#
 
-
-if "test" in sys.argv:
-    ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
-
-    # Дополнительные настройки для тестов
-    PASSWORD_HASHERS = [
-        "django.contrib.auth.hashers.MD5PasswordHasher",  # Быстрее для тестов
-    ]
+# Настройки для тестирования SQLITE, включая CI/CD
+# if "test" in sys.argv:
+#     ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
+#
+#     # Дополнительные настройки для тестов
+#     PASSWORD_HASHERS = [
+#         "django.contrib.auth.hashers.MD5PasswordHasher",  # Быстрее для тестов
+#     ]
+#
+#     # 🗃️ База данных - для тестов стоковая
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": BASE_DIR / "db.sqlite3",
+#         }
+#     }
+#
+#     LANGUAGE_CODE = "ru-ru"
+#     TIME_ZONE = "UTC"
+#     USE_I18N = True
+#     USE_TZ = True
+#
+#     # 📦 Статика
+#     STATIC_URL = "/static/"
+#     STATICFILES_DIRS = []
+#
+#     # 📧 Email
+#     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+#
+#     # ПРОИЗВОЛЬНЫЙ КЛЮЧ ДЛЯ ТЕСТОВ
+#     SECRET_KEY = "ci-test-secret-key-unsafe-but-ok"
+#     DEBUG = True
+#     ROOT_URLCONF = "config.urls"
+#
+#     # 🔑 Указываем, что кастомная модель User — основная
+#     AUTH_USER_MODEL = "users.User"
+#
+#     # 🖼️ TEMPLATES — обязательно для админки
+#     TEMPLATES = [
+#         {
+#             "BACKEND": "django.template.backends.django.DjangoTemplates",
+#             "DIRS": [],
+#             "APP_DIRS": True,
+#             "OPTIONS": {
+#                 "context_processors": [
+#                     "django.template.context_processors.debug",
+#                     "django.template.context_processors.request",
+#                     "django.contrib.auth.context_processors.auth",
+#                     "django.contrib.messages.context_processors.messages",
+#                 ],
+#             },
+#         },
+#     ]
 
 LOGGING = {
     "version": 1,
@@ -212,33 +262,34 @@ LOGGING = {
 # LOGOUT_REDIRECT_URL = 'mailservices:home'# Редирект после выхода(имя приложения и имя в url )
 # LOGIN_URL = 'users:register'# Редирект на страницу регистрации, если вьюшка защищена миксином LoginRequiredMixin
 #
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": os.getenv("REDIS_URL"),
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': os.getenv('REDIS_URL'),
+#     }
+# }
 
 
 # Настройки Celery
-if "test" in sys.argv:
-    # Настройки для тестов
-    CELERY_TASK_ALWAYS_EAGER = True
-    CELERY_TASK_EAGER_PROPAGATES = True
-    # Используем memory backend вместо Redis
-    CELERY_RESULT_BACKEND = "cache"
-    CELERY_CACHE_BACKEND = "memory"
-else:
-    # Реальные настройки
-    CELERY_BROKER_URL = "redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
-# Настройки Celery Beat (планировщик) каждые 6 часов, чтобы не "проморгать" момент отправки
-CELERY_BEAT_SCHEDULE = {
-    "check-habits-daily": {
-        "task": "tracker.tasks.check_all_habits",
-        "schedule": crontab(minute=0, hour="*/6"),
-    },
-}
+# Используем eventlet на Windows
+CELERY_WORKER_POOL = "eventlet"
+CELERY_WORKER_POOL_RESTARTS = True
+
+# Опционально: сериализация
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+#
+# # Настройки Celery Beat (планировщик)
+# CELERY_BEAT_SCHEDULE = {
+#     'deactivate-inactive-users-daily': {
+#         'task': 'educations.tasks.deactivate_inactive_users',
+#         'schedule': crontab(hour=2, minute=0),  # каждый день в 02:00
+#     },
+# }
 TELEGRAM_URL = "https://api.telegram.org/bot"
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")

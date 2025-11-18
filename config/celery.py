@@ -1,6 +1,7 @@
 import os
 from celery import Celery
 import eventlet
+
 eventlet.monkey_patch()
 
 # Установите переменную окружения для настроек Django
